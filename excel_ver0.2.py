@@ -9,6 +9,11 @@ import subprocess
 import requests
 from bs4 import BeautifulSoup
 import datetime
+import sys
+from openpyxl.styles import numbers
+# ビルトインフォーマット
+numbers.BUILTIN_FORMATS
+
 
 # /import
 
@@ -22,21 +27,6 @@ filePass = "python/hello.xlsx"
 # 処理内容
 
 # webの処理
-
-# webdriverによる情報の取得
-# options = Options()
-# # options.add_argument('--headless')#ヘッダーレスモード：コメントアウトで切り替え
-# driver = webdriver.Chrome(driverPass,options=options)
-
-# driver.get("https://stocks.finance.yahoo.co.jp/stocks/detail/?code=998407.O")
-
-# finalDateRate = driver.find_element_by_css_selector(
-#     "#main > div.marB6.chartFinance.clearFix > div.innerDate > div:nth-child(1) > dl > dd > strong")
-
-# コンマがついていると数字で入れてくれないのでコンマを削除する
-# /webdriverによる情報の取得
-
-# requestsとBeautifulSoupによる情報の取得
 
 # URLのHTMLボディの取得
 r=requests.get('https://stocks.finance.yahoo.co.jp/stocks/detail/?code=998407.O')
@@ -71,8 +61,8 @@ config=1
 excelBook = excel.load_workbook(filePass)
 
 # シートのロード
-sheet = excelBook['Sheet']
-config = excelBook['config']
+sheet = excelBook['Sheet1']
+
 
 # 現在日時の取得
 dt_now=datetime.date.today()
@@ -83,19 +73,31 @@ if sheet.cell(row=2,column=2).value == None:
 
 
 # 最終行の取得と新しい行番号処理
-newRowNumber=sheet.max_row+1
+final_row=sheet.max_row
+print(final_row)
+date=sheet.cell(row=final_row,column=2).value
+
+if date==str(dt_now):
+    sys.exit()
+
+print(sheet.cell(row=final_row,column=2).value)
+
+newRowNumber=final_row+1
 print(newRowNumber)
 # セルの取得
 cell=sheet.cell(row=newRowNumber,column=3)
-
+date_cell=sheet.cell(row=newRowNumber,column=2)
 # 値の書き込み
 cell.value=float(rate)
+date_cell.value=str(dt_now)
 
 # セルの値のチェック
 print(cell.value)
 
 # セーブ
 excelBook.save(filePass)
+
+sys.exit()
 
 # /excelの処理
 

@@ -32,10 +32,10 @@ rec = requests.get(
     'https://stocks.finance.yahoo.co.jp/stocks/detail/?code=998407.O')
 
 # HTMLボディのパース処理
-class stock:
-    def __init__(self,a_rate=None,title=None):
-        self._rate=a_rate
-        self._title=title
+# class stock:
+#     def __init__(self,a_rate=None,title=None):
+#         self._rate=a_rate
+#         self._title=title
 
 
 
@@ -63,12 +63,14 @@ print(rates)
 
 print(titles)
 
-r=0
-for tmp1 in rates:
-    stocks.append(stock(tmp1,titles[r]))
-    r+=1
+for tmp_title,tmp_rate in zip(titles,rates):
+    stocks.append(dict(title=tmp_title,rate=tmp_rate))
+
+# for tmp_title,tmp_rate in zip(titles,rates):
+#     stocks.append(stock(tmp_rate,tmp_title))
 
 print(stocks)
+
 
 today_index = soup.select_one(
     '#main > div.marB6.chartFinance.clearFix > div.innerDate > div:nth-child(1) > dl > dd > strong').text
@@ -77,7 +79,7 @@ print(today_index)
 
 rate = today_index.replace(',', '')
 
-print(rate)
+# print(rate)
 # /webの処理
 
 # フォルダとファイルの検索と新規作成
@@ -112,13 +114,13 @@ if is_there is False:
 
 # 接続する
 conn = MySQLdb.connect(user='root', passwd='Akira.299',
-                       host='localhost', db='python')
+                       host='localhost', db='python', charset="utf8")
 
 cur = conn.cursor()
 
 # SQL（データベースを操作するコマンド）を実行する
 # userテーブルから、HostとUser列を取り出す
-sql = "select Host,User from user"
+sql = "select Host,User from user where Host='aa'"
 
 cur.execute(sql)
 
@@ -127,14 +129,14 @@ rows = cur.fetchall()
 
 # 一行ずつ表示する
 for row in rows:
-#  print(row)
- pass
+ print(row)
+#  pass
 
 #データの追加
 
 
-for stock in stocks:
-    cur.execute(f'''insert into user(Host, User) values({stock._title},{stock._rate})''')
+# for stock1 in stocks:
+#         cur.execute("insert into user(Host, User) values(%(title)s,%(rate)s)",stock1)
 
 cur.close
 conn.commit()
@@ -194,6 +196,6 @@ excelBook.save(filePass)
 # /処理内容
 
 # 起動して確認
-EXCEL = r'C:/Users/akira\Documents/書類/python/hello.xlsx'
+EXCEL = r'C:/Users/akira\Documents/書類/python/repository/hello.xlsx'
 subprocess.Popen(['start', '', EXCEL], shell=True)
 # /起動して確認
